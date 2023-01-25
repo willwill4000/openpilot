@@ -571,7 +571,7 @@ def cpp_replay_process(cfg, lr, fingerprint=None):
           response = messaging.recv_one(sockets[s])
 
           if response is None:
-            print(f"Warning, no response received {i}")
+            print(f"Warning, no response received {i} {cfg.proc_name} {s}")
           else:
 
             response = response.as_builder()

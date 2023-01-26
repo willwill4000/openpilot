@@ -79,11 +79,6 @@ class CarController:
         pass
 
       precision = 1  # 0=Comfortable, 1=Precise (the stock system always uses comfortable)
-      try:
-        with open("/data/precision", "r") as f:
-          precision = int(f.read().strip())
-      except:
-        pass
 
       self.apply_curvature_last = apply_curvature
       can_sends.append(create_lka_msg(self.packer))

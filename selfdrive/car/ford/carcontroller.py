@@ -47,8 +47,14 @@ class CarController:
     if (self.frame % CarControllerParams.STEER_STEP) == 0:
       if CC.latActive:
         # apply limits to curvature
-        steer_angle = actuators.steeringAngleDeg / 45. * CarControllerParams.CURVATURE_MAX
-        apply_curvature = -self.VM.calc_curvature(math.radians(steer_angle), CS.out.vEgo, 0.0)
+        if CS.out.leftBlinker:
+          apply_curvature = 0.02
+        elif CS.out.rightBlinker:
+          apply_curvature = -0.02
+        else:
+          apply_curvature = 0
+        # apply_curvature = actuators.steeringAngleDeg / 45. * CarControllerParams.CURVATURE_MAX
+        # apply_curvature = self.VM.calc_curvature(math.radians(steer_angle), CS.out.vEgo, 0.0)
         apply_curvature = apply_std_steer_angle_limits(apply_curvature, self.apply_curvature_last, CS.out.vEgo, CarControllerParams)
         # clip to signal range
         apply_curvature = clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
@@ -68,15 +74,20 @@ class CarController:
         ramp_type = 3
       try:
         with open("/data/ramp_type", "r") as f:
-          ramp_type = int(f.read())
+          ramp_type = int(f.read().strip())
       except:
         pass
 
       precision = 1  # 0=Comfortable, 1=Precise (the stock system always uses comfortable)
+      try:
+        with open("/data/precision", "r") as f:
+          precision = int(f.read().strip())
+      except:
+        pass
 
       self.apply_curvature_last = apply_curvature
       can_sends.append(create_lka_msg(self.packer))
-      can_sends.append(create_lat_ctl_msg(self.packer, CC.latActive, ramp_type, precision, 0., 0., -apply_curvature, 0.))
+      can_sends.append(create_lat_ctl_msg(self.packer, CC.latActive, ramp_type, precision, 0., 0., apply_curvature, 0.))
 
     ### ui ###
     send_ui = (self.main_on_last != main_on) or (self.lkas_enabled_last != CC.latActive) or (self.steer_alert_last != steer_alert)

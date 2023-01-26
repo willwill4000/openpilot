@@ -47,7 +47,8 @@ class CarController:
     if (self.frame % CarControllerParams.STEER_STEP) == 0:
       if CC.latActive:
         # apply limits to curvature
-        apply_curvature = -self.VM.calc_curvature(math.radians(actuators.steeringAngleDeg), CS.out.vEgo, 0.0)
+        steer_angle = actuators.steeringAngleDeg / 45. * CarControllerParams.CURVATURE_MAX
+        apply_curvature = -self.VM.calc_curvature(math.radians(steer_angle), CS.out.vEgo, 0.0)
         apply_curvature = apply_std_steer_angle_limits(apply_curvature, self.apply_curvature_last, CS.out.vEgo, CarControllerParams)
         # clip to signal range
         apply_curvature = clip(apply_curvature, -CarControllerParams.CURVATURE_MAX, CarControllerParams.CURVATURE_MAX)
@@ -65,6 +66,12 @@ class CarController:
         ramp_type = 2
       else:
         ramp_type = 3
+      try:
+        with open("/data/ramp_type", "r") as f:
+          ramp_type = int(f.read())
+      except:
+        pass
+
       precision = 1  # 0=Comfortable, 1=Precise (the stock system always uses comfortable)
 
       self.apply_curvature_last = apply_curvature

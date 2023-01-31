@@ -504,18 +504,35 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
 
   painter.save();
 
-  // circle background
+  painter.setRenderHint(QPainter::Antialiasing);
+  // rounded square background
+  const int cr = 30;
   painter.setOpacity(1.0);
   painter.setPen(Qt::NoPen);
   painter.setBrush(blackColor(70));
-  painter.drawEllipse(x - radius / 2, y - radius / 2, radius, radius);
-
-  // circle border (status)
-  painter.setPen(QPen(QColor::fromRgbF(1.0, 1.0, 1.0, opacity), 8, Qt::SolidLine, Qt::RoundCap));
-  painter.setBrush(Qt::NoBrush);
-  painter.drawEllipse(x - radius / 2, y - radius / 2, radius, radius);
+  QPainterPath path;
+  path.addRoundedRect(QRectF(x - radius / 2, y - radius / 2, radius, radius), cr, cr);
+  painter.drawPath(path);
 
   painter.setCompositionMode(QPainter::CompositionMode_Source);
+  // corners (status)
+  const int el = 18;
+  painter.setPen(QPen(QColor::fromRgbF(1.0, 1.0, 1.0, opacity), 8, Qt::SolidLine, Qt::RoundCap));
+  painter.setBrush(Qt::NoBrush);
+  painter.drawArc(QRectF(x - radius / 2, y - radius / 2, cr*2, cr*2), 90 * 16, 90 * 16); // tl
+  painter.drawLine(x - radius / 2, y - radius / 2 + cr, x - radius / 2, y - radius / 2 + cr + el);
+  painter.drawLine(x - radius / 2 + cr, y - radius / 2, x - radius / 2 + cr + el, y - radius / 2);
+  painter.drawArc(QRectF(x + radius / 2 - cr*2, y - radius / 2, cr*2, cr*2), 0 * 16, 90 * 16); // tr
+  painter.drawLine(x + radius / 2 - cr, y - radius / 2, x + radius / 2 - cr - el, y - radius / 2);
+  painter.drawLine(x + radius / 2, y - radius / 2 + cr, x + radius / 2, y - radius / 2 + cr + el);
+  painter.drawArc(QRectF(x + radius / 2 - cr*2, y + radius / 2 - cr*2, cr*2, cr*2), 0 * 16, -90 * 16); // br
+  painter.drawLine(x + radius / 2, y + radius / 2 - cr, x + radius / 2, y + radius / 2 - cr - el);
+  painter.drawLine(x + radius / 2 - cr, y + radius / 2, x + radius / 2 - cr - el, y + radius / 2);
+  painter.drawArc(QRectF(x - radius / 2, y + radius / 2 - cr*2, cr*2, cr*2), -90 * 16, -90 * 16); // bl
+  painter.drawLine(x - radius / 2 + cr, y + radius / 2, x - radius / 2 + cr + el, y + radius / 2);
+  painter.drawLine(x - radius / 2, y + radius / 2 - cr, x - radius / 2, y + radius / 2 - cr - el);
+
+  painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
   QLinearGradient linearGrad;
   QPointF start_p;

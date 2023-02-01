@@ -678,6 +678,8 @@ int Localizer::locationd_thread() {
     this->observation_values_invalid.insert({service, 0.0});
   }
 
+  bool skip_msg = true;
+
   while (!do_exit) {
     sm.update();
     if (filterInitialized){
@@ -701,6 +703,11 @@ int Localizer::locationd_thread() {
 
       MessageBuilder msg_builder;
       kj::ArrayPtr<capnp::byte> bytes = this->get_message_bytes(msg_builder, inputsOK, sensorsOK, gpsOK, filterInitialized);
+
+      if (skip_msg) {
+        skip_msg = false;
+        continue;
+      }
       pm.send("liveLocationKalman", bytes.begin(), bytes.size());
 
       if (cnt % 1200 == 0 && gpsOK) {  // once a minute

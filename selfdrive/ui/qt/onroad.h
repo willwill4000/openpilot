@@ -57,6 +57,7 @@ private:
   QPixmap dm_img;
   const int radius = 192;
   const int img_size = (radius / 2) * 1.5;
+  const int dm_sq_width = 168;
   float speed;
   bool isStandstill = false;
   QString speedUnit;

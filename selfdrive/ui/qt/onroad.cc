@@ -393,7 +393,7 @@ void AnnotatedCameraWidget::drawHud(QPainter &p, const UIState *s) {
 
   // dm icon
   if (!hideDM) {
-    int dm_icon_x = rightHandDM ? rect().right() -  radius / 2 - (bdr_s * 2) : radius / 2 + (bdr_s * 2);
+    int dm_icon_x = rightHandDM ? rect().right() -  dm_sq_width / 2 - (bdr_s * 2) : dm_sq_width / 2 + (bdr_s * 2);
     drawDriverState(p, s, dm_icon_x, rect().bottom() - footer_h / 2, dmActive ? 1.0 : 0.2);
   }
   p.restore();
@@ -511,26 +511,26 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
   painter.setPen(Qt::NoPen);
   painter.setBrush(blackColor(70));
   QPainterPath path;
-  path.addRoundedRect(QRectF(x - radius / 2, y - radius / 2, radius, radius), cr, cr);
+  path.addRoundedRect(QRectF(x - dm_sq_width / 2, y - dm_sq_width / 2, dm_sq_width, dm_sq_width), cr, cr);
   painter.drawPath(path);
 
   painter.setCompositionMode(QPainter::CompositionMode_Source);
   // corners (status)
-  const int el = 18;
-  painter.setPen(QPen(QColor::fromRgbF(1.0, 1.0, 1.0, opacity), 8, Qt::SolidLine, Qt::RoundCap));
+  const int el = 16;
+  painter.setPen(QPen(QColor::fromRgbF(1.0, 1.0, 1.0, opacity), 5, Qt::SolidLine, Qt::RoundCap));
   painter.setBrush(Qt::NoBrush);
-  painter.drawArc(QRectF(x - radius / 2, y - radius / 2, cr*2, cr*2), 90 * 16, 90 * 16); // tl
-  painter.drawLine(x - radius / 2, y - radius / 2 + cr, x - radius / 2, y - radius / 2 + cr + el);
-  painter.drawLine(x - radius / 2 + cr, y - radius / 2, x - radius / 2 + cr + el, y - radius / 2);
-  painter.drawArc(QRectF(x + radius / 2 - cr*2, y - radius / 2, cr*2, cr*2), 0 * 16, 90 * 16); // tr
-  painter.drawLine(x + radius / 2 - cr, y - radius / 2, x + radius / 2 - cr - el, y - radius / 2);
-  painter.drawLine(x + radius / 2, y - radius / 2 + cr, x + radius / 2, y - radius / 2 + cr + el);
-  painter.drawArc(QRectF(x + radius / 2 - cr*2, y + radius / 2 - cr*2, cr*2, cr*2), 0 * 16, -90 * 16); // br
-  painter.drawLine(x + radius / 2, y + radius / 2 - cr, x + radius / 2, y + radius / 2 - cr - el);
-  painter.drawLine(x + radius / 2 - cr, y + radius / 2, x + radius / 2 - cr - el, y + radius / 2);
-  painter.drawArc(QRectF(x - radius / 2, y + radius / 2 - cr*2, cr*2, cr*2), -90 * 16, -90 * 16); // bl
-  painter.drawLine(x - radius / 2 + cr, y + radius / 2, x - radius / 2 + cr + el, y + radius / 2);
-  painter.drawLine(x - radius / 2, y + radius / 2 - cr, x - radius / 2, y + radius / 2 - cr - el);
+  painter.drawArc(QRectF(x - dm_sq_width / 2, y - dm_sq_width / 2, cr*2, cr*2), 90 * 16, 90 * 16); // tl
+  painter.drawLine(x - dm_sq_width / 2, y - dm_sq_width / 2 + cr, x - dm_sq_width / 2, y - dm_sq_width / 2 + cr + el);
+  painter.drawLine(x - dm_sq_width / 2 + cr, y - dm_sq_width / 2, x - dm_sq_width / 2 + cr + el, y - dm_sq_width / 2);
+  painter.drawArc(QRectF(x + dm_sq_width / 2 - cr*2, y - dm_sq_width / 2, cr*2, cr*2), 0 * 16, 90 * 16); // tr
+  painter.drawLine(x + dm_sq_width / 2 - cr, y - dm_sq_width / 2, x + dm_sq_width / 2 - cr - el, y - dm_sq_width / 2);
+  painter.drawLine(x + dm_sq_width / 2, y - dm_sq_width / 2 + cr, x + dm_sq_width / 2, y - dm_sq_width / 2 + cr + el);
+  painter.drawArc(QRectF(x + dm_sq_width / 2 - cr*2, y + dm_sq_width / 2 - cr*2, cr*2, cr*2), 0 * 16, -90 * 16); // br
+  painter.drawLine(x + dm_sq_width / 2, y + dm_sq_width / 2 - cr, x + dm_sq_width / 2, y + dm_sq_width / 2 - cr - el);
+  painter.drawLine(x + dm_sq_width / 2 - cr, y + dm_sq_width / 2, x + dm_sq_width / 2 - cr - el, y + dm_sq_width / 2);
+  painter.drawArc(QRectF(x - dm_sq_width / 2, y + dm_sq_width / 2 - cr*2, cr*2, cr*2), -90 * 16, -90 * 16); // bl
+  painter.drawLine(x - dm_sq_width / 2 + cr, y + dm_sq_width / 2, x - dm_sq_width / 2 + cr + el, y + dm_sq_width / 2);
+  painter.drawLine(x - dm_sq_width / 2, y + dm_sq_width / 2 - cr, x - dm_sq_width / 2, y + dm_sq_width / 2 - cr - el);
 
   painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 

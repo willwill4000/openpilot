@@ -534,7 +534,7 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
 
   painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
-  QLinearGradient linearGrad;
+  // QLinearGradient linearGrad;
   QPointF start_p;
   QPointF end_p;
   int face_segment_idx = 0;
@@ -556,15 +556,15 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
     start_p = QPointF(scene.face_kpts_draw[i].x() + x, scene.face_kpts_draw[i].y() + y);
     end_p = QPointF(scene.face_kpts_draw[i+1].x() + x, scene.face_kpts_draw[i+1].y() + y);
 
-    linearGrad.setStart(start_p);
-    float start_shade = std::fmax(std::fmin(0.4 + 0.6*(scene.face_kpts_draw_d[i] + 20)/100, 1.0), 0.0);
-    linearGrad.setColorAt(0, QColor::fromRgbF(start_shade, start_shade, start_shade, opacity));
+    // linearGrad.setStart(start_p);
+    // float start_shade = std::fmax(std::fmin(0.4 + 0.6*(scene.face_kpts_draw_d[i] + 20)/100, 1.0), 0.0);
+    // linearGrad.setColorAt(0, QColor::fromRgbF(start_shade, start_shade, start_shade, opacity));
 
-    linearGrad.setFinalStop(end_p);
-    float end_shade = std::fmax(std::fmin(0.4 + 0.6*(scene.face_kpts_draw_d[i+1] + 20)/100, 1.0), 0.0);
-    linearGrad.setColorAt(1, QColor::fromRgbF(end_shade, end_shade, end_shade, opacity));
+    // linearGrad.setFinalStop(end_p);
+    // float end_shade = std::fmax(std::fmin(0.4 + 0.6*(scene.face_kpts_draw_d[i+1] + 20)/100, 1.0), 0.0);
+    // linearGrad.setColorAt(1, QColor::fromRgbF(end_shade, end_shade, end_shade, opacity));
 
-    painter.setPen(QPen(linearGrad, i<16 ? 7 : 3, Qt::SolidLine, Qt::RoundCap));
+    painter.setPen(QPen(QColor::fromRgbF(1.0, 1.0, 1.0, opacity), 10, Qt::SolidLine, Qt::RoundCap));
     painter.drawLine(start_p, end_p);
   }
 

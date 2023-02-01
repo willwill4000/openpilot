@@ -141,7 +141,7 @@ void update_dmonitoring(UIState *s, const cereal::DriverStateV2::Reader &drivers
     vec3 kpt_this = default_face_kpts_3d[kpi];
     kpt_this = matvecmul3(r_xyz, kpt_this);
     scene.face_kpts_draw[kpi] = QPointF(kpt_this.v[0], kpt_this.v[1]);
-    scene.face_kpts_draw_d[kpi] = kpt_this.v[2] * (1.0-dm_fade_state) + 80 * dm_fade_state;
+    scene.face_kpts_draw_d[kpi] = kpt_this.v[2] * (1.0-dm_fade_state) + 35 * dm_fade_state;
   }
 }
 

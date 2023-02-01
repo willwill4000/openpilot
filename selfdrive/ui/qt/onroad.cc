@@ -514,10 +514,10 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
   path.addRoundedRect(QRectF(x - dm_sq_width / 2, y - dm_sq_width / 2, dm_sq_width, dm_sq_width), cr, cr);
   painter.drawPath(path);
 
-  painter.setCompositionMode(QPainter::CompositionMode_Source);
+  // painter.setCompositionMode(QPainter::CompositionMode_Source);
   // corners (status)
   const int el = 16;
-  painter.setPen(QPen(QColor::fromRgbF(1.0, 1.0, 1.0, opacity), 5, Qt::SolidLine, Qt::RoundCap));
+  painter.setPen(QPen(QColor::fromRgbF(opacity, opacity, opacity, 1.0), 5, Qt::SolidLine, Qt::RoundCap));
   painter.setBrush(Qt::NoBrush);
   painter.drawArc(QRectF(x - dm_sq_width / 2, y - dm_sq_width / 2, cr*2, cr*2), 90 * 16, 90 * 16); // tl
   painter.drawLine(x - dm_sq_width / 2, y - dm_sq_width / 2 + cr, x - dm_sq_width / 2, y - dm_sq_width / 2 + cr + el);
@@ -532,7 +532,7 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
   painter.drawLine(x - dm_sq_width / 2 + cr, y + dm_sq_width / 2, x - dm_sq_width / 2 + cr + el, y + dm_sq_width / 2);
   painter.drawLine(x - dm_sq_width / 2, y + dm_sq_width / 2 - cr, x - dm_sq_width / 2, y + dm_sq_width / 2 - cr - el);
 
-  painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+  // painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
 
   // QLinearGradient linearGrad;
   QPointF start_p;

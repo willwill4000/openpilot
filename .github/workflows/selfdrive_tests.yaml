@@ -82,7 +82,7 @@ jobs:
                           scons -j$(nproc) --cache-populate"
 
   build_all_ubuntu_2204:
-    name: build all
+    name: build all ubuntu22.04
     runs-on: ubuntu-22.04
     timeout-minutes: 30
     steps:
@@ -97,7 +97,8 @@ jobs:
     - name: Cleanup scons cache
       run: |
           ${{ env.RUN }} "rm -rf /tmp/scons_cache/* && \
-                          scons -j$(nproc) --cache
+                          scons -j$(nproc) --cache-populate"
+
 
   #build_mac:
   #  name: build macos

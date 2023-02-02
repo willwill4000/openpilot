@@ -555,8 +555,8 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
       continue;
     }
 
-    kp1 = (scene.face_kpts_draw_d[i] - 40) / 150 + 1.0;
-    kp2 = (scene.face_kpts_draw_d[i+1] - 40) / 150 + 1.0;
+    kp1 = (scene.face_kpts_draw_d[i] - 40) / 80 + 1.0;
+    kp2 = (scene.face_kpts_draw_d[i+1] - 40) / 80 + 1.0;
     start_p = QPointF(scene.face_kpts_draw[i].x()*kp1 + x, scene.face_kpts_draw[i].y()*kp1 + y);
     end_p = QPointF(scene.face_kpts_draw[i+1].x()*kp2 + x, scene.face_kpts_draw[i+1].y()*kp2 + y);
 
@@ -568,7 +568,7 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
     // float end_shade = std::fmax(std::fmin(0.4 + 0.6*(scene.face_kpts_draw_d[i+1] + 20)/100, 1.0), 0.0);
     // linearGrad.setColorAt(1, QColor::fromRgbF(end_shade, end_shade, end_shade, opacity));
 
-    painter.setPen(QPen(QColor::fromRgbF(opacity, opacity, opacity, 1.0), 8, Qt::SolidLine, Qt::RoundCap));
+    painter.setPen(QPen(QColor::fromRgbF(opacity, opacity, opacity, 1.0), i > 3 ? 8 : 11, Qt::SolidLine, Qt::RoundCap));
     painter.drawLine(start_p, end_p);
   }
 

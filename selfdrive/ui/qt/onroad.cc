@@ -555,8 +555,8 @@ void AnnotatedCameraWidget::drawDriverState(QPainter &painter, const UIState *s,
       continue;
     }
 
-    kp1 = (scene.face_kpts_draw_d[i] - 40) / 150 + 1.0;
-    kp2 = (scene.face_kpts_draw_d[i+1] - 40) / 150 + 1.0;
+    kp1 = (scene.face_kpts_draw_d[i] - 35) / 100 + 1.0;
+    kp2 = (scene.face_kpts_draw_d[i+1] - 35) / 100 + 1.0;
     start_p = QPointF(scene.face_kpts_draw[i].x()*kp1 + x, scene.face_kpts_draw[i].y()*kp1 + y);
     end_p = QPointF(scene.face_kpts_draw[i+1].x()*kp2 + x, scene.face_kpts_draw[i+1].y()*kp2 + y);
 

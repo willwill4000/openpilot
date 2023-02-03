@@ -136,14 +136,12 @@ class Laikad:
     return week, tow, new_meas
 
   def is_ephemeris(self, gnss_msg):
-    mwhich = gnss_msg.which()
     if self.use_qcom:
-      return mwhich == 'drSvPoly'
+      return gnss_msg.which() == 'drSvPoly'
     else:
-      return mwhich == 'ephemeris' or mwhich == 'glonassEphemeris'
+      return gnss_msg.which() in ('ephemeris', 'glonassEphemeris')
 
   def read_ephemeris(self, gnss_msg):
-    # TODO this only works on GLONASS
     if self.use_qcom:
       # TODO this is not robust to gps week rollover
       if self.gps_week is None:
@@ -152,8 +150,11 @@ class Laikad:
     else:
       if gnss_msg.which() == 'ephemeris':
         ephem = convert_ublox_gps_ephem(gnss_msg.ephemeris)
-      else:
+      elif gnss_msg.which() == 'glonassEphemeris':
         ephem = convert_ublox_glonass_ephem(gnss_msg.glonassEphemeris)
+      else:
+        cloudlog.error(f"Unsupported ephemeris type: {gnss_msg.which()}")
+        return
     self.astro_dog.add_navs({ephem.prn: [ephem]})
     self.cache_ephemeris(t=ephem.epoch)
 
@@ -415,8 +416,13 @@ def main(sm=None, pm=None, qc=None):
   if pm is None:
     pm = messaging.PubMaster(['gnssMeasurements'])
 
-  replay = "REPLAY" in os.environ
+  # disable until set as main gps source, to better analyze startup time
   use_internet = False #"LAIKAD_NO_INTERNET" not in os.environ
+
+  replay = "REPLAY" in os.environ
+  if replay or "CI" in os.environ:
+    use_internet = True
+
   laikad = Laikad(save_ephemeris=not replay, auto_fetch_navs=use_internet, use_qcom=use_qcom)
 
   while True:

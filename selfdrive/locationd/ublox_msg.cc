@@ -70,14 +70,11 @@ inline uint16_t UbloxMsgParser::get_glonass_year(uint8_t N4, uint16_t Nt) {
   int J = 0;
   if (1 <= Nt && Nt <= 366) {
     J = 1;
-  }
-  else if (367 <= Nt && Nt <= 731) {
+  } else if (367 <= Nt && Nt <= 731) {
     J = 2;
-  }
-  else if (732 <= Nt && Nt <= 1096) {
+  } else if (732 <= Nt && Nt <= 1096) {
     J = 3;
-  }
-  else if (1097 <= Nt && Nt <= 1461) {
+  } else if (1097 <= Nt && Nt <= 1461) {
     J = 4;
   }
   uint16_t year = 1996 + 4*(N4 -1) + (J - 1);
@@ -373,7 +370,8 @@ kj::Array<capnp::word> UbloxMsgParser::parse_glonass_ephemeris(ubx_t::rxm_sfrbx_
     glonass_t gl_stream(&stream);
     glonass_t::string_5_t* data = static_cast<glonass_t::string_5_t*>(gl_stream.data());
 
-    // TODO: remove parsing string5, its only needed for the year
+    // string5 parsing is only needed to get the year, this can be removed and
+    // the year can be fetched later in laika (note rollovers and leap year)
     uint8_t n_4 = data->n_4();
     uint16_t year = get_glonass_year(n_4, current_day);
 

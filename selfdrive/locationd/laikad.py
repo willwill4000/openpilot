@@ -396,6 +396,9 @@ def process_msg(laikad, gnss_msg, mono_time, block=False):
 
 
 def clear_tmp_cache():
+  if any(x in os.environ for x in ["REPLAY", "CI"]):
+    return
+
   if os.path.exists(DOWNLOADS_CACHE_FOLDER):
     shutil.rmtree(DOWNLOADS_CACHE_FOLDER)
   os.mkdir(DOWNLOADS_CACHE_FOLDER)

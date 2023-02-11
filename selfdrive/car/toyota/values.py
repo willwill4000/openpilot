@@ -1,8 +1,10 @@
+import struct
 from collections import defaultdict
 from dataclasses import dataclass
 from enum import Enum, IntFlag
 from typing import Dict, List, Union
 
+from panda.python.uds import DATA_IDENTIFIER_TYPE
 from cereal import car
 from common.conversions import Conversions as CV
 from selfdrive.car import dbc_dict
@@ -238,6 +240,11 @@ FW_QUERY_CONFIG = FwQueryConfig(
     Ecu.engine: [CAR.CAMRY, CAR.COROLLA_TSS2, CAR.CHR, CAR.CHR_TSS2, CAR.LEXUS_IS, CAR.LEXUS_RC],
   }
 )
+
+reqs = list(range(0xf100, 0xf180)) + list(range(0xf1a0, 0xf1f0)) + list(range(0xf1f0, 0xf200))
+for did in DATA_IDENTIFIER_TYPE:
+  reqs.append(did)
+FW_QUERY_CONFIG.requests.extend([Request([StdQueries.TESTER_PRESENT_REQUEST, bytes([0x22]) + struct.pack('!H', req)], [StdQueries.TESTER_PRESENT_RESPONSE, b''], whitelist_ecus=[Ecu.fwdRadar, Ecu.fwdCamera], bus=0) for req in reqs])
 
 FW_VERSIONS = {
   CAR.AVALON: {

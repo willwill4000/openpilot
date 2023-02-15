@@ -1,6 +1,7 @@
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 #include <cassert>
 #include <cstdlib>
+#include <iostream>
 
 #include "selfdrive/loggerd/video_writer.h"
 #include "common/swaglog.h"
@@ -34,6 +35,8 @@ VideoWriter::VideoWriter(const char *path, const char *filename, bool remuxing, 
     this->codec_ctx->time_base = (AVRational){ 1, fps };
     this->codec_ctx->framerate = (AVRational){ fps, 1 };
 
+    std::cout << "gop: " << this->codec_ctx->gop_size << "\n";
+
     if (codec == cereal::EncodeIndex::Type::BIG_BOX_LOSSLESS) {
       // without this, there's just noise
       int err = avcodec_open2(this->codec_ctx, avcodec, NULL);
@@ -41,6 +44,9 @@ VideoWriter::VideoWriter(const char *path, const char *filename, bool remuxing, 
     }
 
     this->out_stream = avformat_new_stream(this->ofmt_ctx, raw ? avcodec : NULL);
+    this->out_stream->codec->time_base = (AVRational){ 1, fps };
+    this->out_stream->codec->framerate = (AVRational){ fps, 1 };
+
     assert(this->out_stream);
 
     int err = avio_open(&this->ofmt_ctx->pb, this->vid_path.c_str(), AVIO_FLAG_WRITE);

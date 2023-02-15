@@ -32,6 +32,7 @@ VideoWriter::VideoWriter(const char *path, const char *filename, bool remuxing, 
     this->codec_ctx->height = height;
     this->codec_ctx->pix_fmt = AV_PIX_FMT_YUV420P;
     this->codec_ctx->time_base = (AVRational){ 1, fps };
+    this->codec_ctx->framerate = (AVRational){ fps, 1 };
 
     if (codec == cereal::EncodeIndex::Type::BIG_BOX_LOSSLESS) {
       // without this, there's just noise

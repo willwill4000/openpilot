@@ -22,9 +22,18 @@ def create_lkas11(packer, frame, car_fingerprint, apply_steer, steer_req,
                          CAR.ELANTRA_HEV_2021, CAR.SONATA_HYBRID, CAR.KONA_EV, CAR.KONA_HEV, CAR.KONA_EV_2022,
                          CAR.SANTA_FE_2022, CAR.KIA_K5_2021, CAR.IONIQ_HEV_2022, CAR.SANTA_FE_HEV_2022,
                          CAR.SANTA_FE_PHEV_2022, CAR.KIA_STINGER_2022, CAR.KIA_K5_HEV_2020):
+    # Not set on the Sonata, but set on the Kia Niro EV
+    # Does this do anything?
     values["CF_Lkas_LdwsActivemode"] = int(left_lane) + (int(right_lane) << 1)
+
+    # Sonata:
+    # Stock is 2 when SCC disabled or standstill, overrides enabled
+    # 7 when enabled
+    # Kia Niro EV:
+    # Always 2
     values["CF_Lkas_LdwsOpt_USM"] = 2
 
+    # 2 when enabled on Kia Niro EV, 4 on Sonata
     # FcwOpt_USM 5 = Orange blinking car + lanes
     # FcwOpt_USM 4 = Orange car + lanes
     # FcwOpt_USM 3 = Green blinking car + lanes

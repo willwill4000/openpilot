@@ -410,16 +410,14 @@ def clear_tmp_cache():
 def main(sm=None, pm=None, qc=None):
   #clear_tmp_cache()
 
-  use_qcom = not Params().get_bool("UbloxAvailable", block=True)
-  if use_qcom or (qc is not None and qc):
-    raw_gnss_socket = "qcomGnss"
-  else:
-    raw_gnss_socket = "ubloxGnss"
-
+  use_qcom = True #not Params().get_bool("UbloxAvailable", block=True)
   if sm is None:
-    sm = messaging.SubMaster([raw_gnss_socket, 'clocks'])
+    sm = messaging.SubMaster(['clocks'])
   if pm is None:
     pm = messaging.PubMaster(['gnssMeasurements'])
+
+  qcom_sock = messaging.sub_sock("qcomGnss")
+
 
   # disable until set as main gps source, to better analyze startup time
   use_internet = False #"LAIKAD_NO_INTERNET" not in os.environ
@@ -433,10 +431,16 @@ def main(sm=None, pm=None, qc=None):
   while True:
     sm.update()
 
-    if sm.updated[raw_gnss_socket]:
-      gnss_msg = sm[raw_gnss_socket]
+    #if sm.updated[raw_gnss_socket]:
+    #  gnss_msg = sm[raw_gnss_socket]
 
-      msg = process_msg(laikad, gnss_msg, sm.logMonoTime[raw_gnss_socket], replay)
+    # for QCOM all ephemeris messages come in at once, `updated` skips ephem
+    # msgs frequently cause there is too much at once to handle, drain_sock
+    # does not have this issue
+    gnss_msgs = messaging.drain_sock(qcom_sock)
+    for gnss_msg in gnss_msgs:
+
+      msg = process_msg(laikad, gnss_msg.qcomGnss, gnss_msg.logMonoTime, replay)
       if msg is None:
         # TODO: beautify this, locationd needs a valid message
         msg = messaging.new_message("gnssMeasurements")

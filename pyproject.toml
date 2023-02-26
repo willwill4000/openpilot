@@ -10,7 +10,7 @@ documentation = "https://docs.comma.ai"
 
 
 [tool.poetry.dependencies]
-python = "~3.8"
+python = "~3.11"
 atomicwrites = "^1.4.0"
 casadi = { version = "==3.5.5", platform = "linux" }
 cffi = "^1.15.1"

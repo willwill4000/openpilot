@@ -57,7 +57,7 @@ class CarController:
 
       if self.CP.carFingerprint in CANFD_CARS:
         # TODO: extended mode
-        mode = 1 if CC.latActive else 0
+        mode = 1 if CC.latActive and not CS.out.steerFaultTemporary else 0
         counter = self.frame // CarControllerParams.STEER_STEP
         can_sends.append(create_lat_ctl2_msg(self.packer, mode, 0., 0., -apply_curvature, 0., counter))
       else:

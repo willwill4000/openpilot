@@ -62,7 +62,7 @@ polyline = "^1.4.0"
 
 
 [tool.poetry.group.dev.dependencies]
-av = "^9.2.0"
+av = "^10.0.0"
 azure-storage-blob = "~2.1"
 breathe = "^4.34.0"
 carla = { version = "==0.9.13", platform = "linux" }

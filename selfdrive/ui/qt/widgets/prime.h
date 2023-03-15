@@ -50,9 +50,6 @@ public:
 
 private:
   QVBoxLayout* mainLayout;
-
-private slots:
-  void replyFinished(const QString &response);
 };
 
 

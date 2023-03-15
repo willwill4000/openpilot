@@ -62,7 +62,7 @@ MapPanel::MapPanel(QWidget* parent) : QWidget(parent) {
     QVBoxLayout *current_layout = new QVBoxLayout(current_widget);
 
     QLabel *title = new QLabel(tr("Current Destination"));
-    title->setStyleSheet("font-size: 55px");
+    title->setStyleSheet("font-size: 50px");
     current_layout->addWidget(title);
 
     current_route = new ButtonControl("", tr("CLEAR"));
@@ -81,7 +81,7 @@ MapPanel::MapPanel(QWidget* parent) : QWidget(parent) {
 
   // Recents
   QLabel *recents_title = new QLabel(tr("Recent Destinations"));
-  recents_title->setStyleSheet("font-size: 55px");
+  recents_title->setStyleSheet("font-size: 50px");
   main_layout->addWidget(recents_title);
   main_layout->addSpacing(20);
 
@@ -271,13 +271,13 @@ void MapPanel::refresh() {
 
 
         QLabel *recent_label = new QLabel(shorten(name + " " + details, 45));
-        recent_label->setStyleSheet(R"(font-size: 50px;)");
+        recent_label->setStyleSheet(R"(font-size: 36px;)");
 
         layout->addWidget(recent_label);
         layout->addStretch();
 
         QLabel *arrow = new QLabel("→");
-        arrow->setStyleSheet(R"(font-size: 60px;)");
+        arrow->setStyleSheet(R"(font-size: 40px;)");
         layout->addWidget(arrow);
 
         widget->setStyleSheet(R"(

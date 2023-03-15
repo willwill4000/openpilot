@@ -141,6 +141,8 @@ PrimeUserWidget::PrimeUserWidget(QWidget* parent) : QWidget(parent) {
   primeLayout->addWidget(connectUrl, 0, Qt::AlignTop);
 
   mainLayout->addWidget(primeWidget);
+
+  mainLayout->addStretch();
 }
 
 PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {

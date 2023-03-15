@@ -631,10 +631,6 @@ Isso pode levar até um minuto.</translation>
         <source>Software</source>
         <translation>Software</translation>
     </message>
-    <message>
-        <source>Navigation</source>
-        <translation>Navegação</translation>
-    </message>
 </context>
 <context>
     <name>Setup</name>

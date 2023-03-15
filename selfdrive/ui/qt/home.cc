@@ -4,6 +4,7 @@
 #include <QMouseEvent>
 #include <QVBoxLayout>
 
+#include "selfdrive/ui/qt/maps/map_settings.h"
 #include "selfdrive/ui/qt/offroad/experimental_mode.h"
 #include "selfdrive/ui/qt/util.h"
 #include "selfdrive/ui/qt/widgets/drive_stats.h"
@@ -140,7 +141,7 @@ OffroadHome::OffroadHome(QWidget* parent) : QFrame(parent) {
   QObject::connect(experimental_mode, &ExperimentalModeButton::openSettings, this, &OffroadHome::openSettings);
 
   statsAndExperimentalModeButton->addWidget(experimental_mode, 1);
-  statsAndExperimentalModeButton->addWidget(new DriveStats, 1);
+  statsAndExperimentalModeButton->addWidget(new MapPanel, 1);
 
   // Horizontal experimental + drive stats and setup widget
   QWidget* statsAndSetupWidget = new QWidget(this);

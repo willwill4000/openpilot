@@ -141,26 +141,6 @@ PrimeUserWidget::PrimeUserWidget(QWidget* parent) : QWidget(parent) {
   primeLayout->addWidget(connectUrl, 0, Qt::AlignTop);
 
   mainLayout->addWidget(primeWidget);
-
-  mainLayout->addStretch();
-
-  // set up API requests
-  if (auto dongleId = getDongleId()) {
-    QString url = CommaApi::BASE_URL + "/v1/devices/" + *dongleId + "/owner";
-    RequestRepeater *repeater = new RequestRepeater(this, url, "ApiCache_Owner", 6);
-    QObject::connect(repeater, &RequestRepeater::requestDone, this, &PrimeUserWidget::replyFinished);
-  }
-}
-
-void PrimeUserWidget::replyFinished(const QString &response) {
-  QJsonDocument doc = QJsonDocument::fromJson(response.toUtf8());
-  if (doc.isNull()) {
-    qDebug() << "JSON Parse failed on getting points";
-    return;
-  }
-
-  QJsonObject json = doc.object();
-  points->setText(QString::number(json["points"].toInt()));
 }
 
 PrimeAdWidget::PrimeAdWidget(QWidget* parent) : QFrame(parent) {

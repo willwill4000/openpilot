@@ -50,7 +50,6 @@ public:
 
 private:
   QVBoxLayout* mainLayout;
-  QLabel* points;
 
 private slots:
   void replyFinished(const QString &response);

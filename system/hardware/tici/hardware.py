@@ -452,11 +452,9 @@ class Tici(HardwareBase):
     # Allow thermald to write engagement status to kmsg
     os.system("sudo chmod a+w /dev/kmsg")
 
-    # TODO: remove the if once agnos 7 ships
     # Turn off fan, turned on by the ABL
-    if os.path.exists('/sys/class/gpio/gpio49/'):
-      gpio_init(GPIO.SOM_ST_IO, True)
-      gpio_set(GPIO.SOM_ST_IO, 0)
+    gpio_init(GPIO.SOM_ST_IO, True)
+    gpio_set(GPIO.SOM_ST_IO, 0)
 
     # *** IRQ config ***
 

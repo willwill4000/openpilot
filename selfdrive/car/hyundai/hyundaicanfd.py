@@ -5,7 +5,7 @@ def get_e_can_bus(CP):
   # On the CAN-FD platforms, the LKAS camera is on both A-CAN and E-CAN. HDA2 cars
   # have a different harness than the HDA1 and non-HDA variants in order to split
   # a different bus, since the steering is done by different ECUs.
-  return 5 if CP.flags & HyundaiFlags.CANFD_HDA2 else 4
+  return 1 if CP.flags & HyundaiFlags.CANFD_HDA2 else 0
 
 
 def create_steering_messages(packer, CP, enabled, lat_active, apply_steer):
@@ -26,10 +26,10 @@ def create_steering_messages(packer, CP, enabled, lat_active, apply_steer):
 
   if CP.flags & HyundaiFlags.CANFD_HDA2:
     if CP.openpilotLongitudinalControl:
-      ret.append(packer.make_can_msg("LFA", 5, values))
-    ret.append(packer.make_can_msg("LKAS", 4, values))
+      ret.append(packer.make_can_msg("LFA", 1, values))
+    ret.append(packer.make_can_msg("LKAS", 0, values))
   else:
-    ret.append(packer.make_can_msg("LFA", 4, values))
+    ret.append(packer.make_can_msg("LFA", 0, values))
 
   return ret
 
@@ -37,7 +37,7 @@ def create_cam_0x2a4(packer, camera_values):
   camera_values.update({
     "BYTE7": 0,
   })
-  return packer.make_can_msg("CAM_0x2a4", 4, camera_values)
+  return packer.make_can_msg("CAM_0x2a4", 0, camera_values)
 
 def create_buttons(packer, CP, cnt, btn):
   values = {
@@ -46,7 +46,7 @@ def create_buttons(packer, CP, cnt, btn):
     "CRUISE_BUTTONS": btn,
   }
 
-  bus = 5 if CP.flags & HyundaiFlags.CANFD_HDA2 else 6
+  bus = 1 if CP.flags & HyundaiFlags.CANFD_HDA2 else 2
   return packer.make_can_msg("CRUISE_BUTTONS", bus, values)
 
 def create_acc_cancel(packer, CP, cruise_info_copy):
@@ -100,7 +100,7 @@ def create_spas_messages(packer, frame, left_blink, right_blink):
 
   values = {
   }
-  ret.append(packer.make_can_msg("SPAS1", 5, values))
+  ret.append(packer.make_can_msg("SPAS1", 1, values))
 
   blink = 0
   if left_blink:
@@ -110,7 +110,7 @@ def create_spas_messages(packer, frame, left_blink, right_blink):
   values = {
     "BLINKER_CONTROL": blink,
   }
-  ret.append(packer.make_can_msg("SPAS2", 5, values))
+  ret.append(packer.make_can_msg("SPAS2", 1, values))
 
   return ret
 
@@ -123,7 +123,7 @@ def create_adrv_messages(packer, frame):
 
   values = {
   }
-  ret.append(packer.make_can_msg("ADRV_0x51", 4, values))
+  ret.append(packer.make_can_msg("ADRV_0x51", 0, values))
 
   if frame % 2 == 0:
     values = {
@@ -133,7 +133,7 @@ def create_adrv_messages(packer, frame):
       'SET_ME_FC': 0xfc,
       'SET_ME_9': 0x9,
     }
-    ret.append(packer.make_can_msg("ADRV_0x160", 5, values))
+    ret.append(packer.make_can_msg("ADRV_0x160", 1, values))
 
   if frame % 5 == 0:
     values = {
@@ -142,25 +142,25 @@ def create_adrv_messages(packer, frame):
       'SET_ME_TMP_F': 0xf,
       'SET_ME_TMP_F_2': 0xf,
     }
-    ret.append(packer.make_can_msg("ADRV_0x1ea", 5, values))
+    ret.append(packer.make_can_msg("ADRV_0x1ea", 1, values))
 
     values = {
       'SET_ME_E1': 0xe1,
       'SET_ME_3A': 0x3a,
     }
-    ret.append(packer.make_can_msg("ADRV_0x200", 5, values))
+    ret.append(packer.make_can_msg("ADRV_0x200", 1, values))
 
   if frame % 20 == 0:
     values = {
       'SET_ME_15': 0x15,
     }
-    ret.append(packer.make_can_msg("ADRV_0x345", 5, values))
+    ret.append(packer.make_can_msg("ADRV_0x345", 1, values))
 
   if frame % 100 == 0:
     values = {
       'SET_ME_22': 0x22,
       'SET_ME_41': 0x41,
     }
-    ret.append(packer.make_can_msg("ADRV_0x1da", 5, values))
+    ret.append(packer.make_can_msg("ADRV_0x1da", 1, values))
 
   return ret

@@ -30,15 +30,15 @@ class CarInterface(CarInterfaceBase):
 
     if candidate in CANFD_CAR:
       # detect HDA2 with ADAS Driving ECU
-      if Ecu.adas in [fw.ecu for fw in car_fw]:
+      if True:
         ret.flags |= HyundaiFlags.CANFD_HDA2.value
       else:
         # non-HDA2
-        if 0x1cf not in fingerprint[4]:
+        if 0x1cf not in fingerprint[0]:
           ret.flags |= HyundaiFlags.CANFD_ALT_BUTTONS.value
         # ICE cars do not have 0x130; GEARS message on 0x40 or 0x70 instead
-        if 0x130 not in fingerprint[4]:
-          if 0x40 not in fingerprint[4]:
+        if 0x130 not in fingerprint[0]:
+          if 0x40 not in fingerprint[0]:
             ret.flags |= HyundaiFlags.CANFD_ALT_GEARS_2.value
           else:
             ret.flags |= HyundaiFlags.CANFD_ALT_GEARS.value
@@ -254,15 +254,14 @@ class CarInterface(CarInterfaceBase):
 
     # *** panda safety config ***
     if candidate in CANFD_CAR:
-      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.noOutput),
-                           get_safety_config(car.CarParams.SafetyModel.hyundaiCanfd)]
+      ret.safetyConfigs = [get_safety_config(car.CarParams.SafetyModel.hyundaiCanfd), ]
 
       if ret.flags & HyundaiFlags.CANFD_HDA2:
-        ret.safetyConfigs[1].safetyParam |= Panda.FLAG_HYUNDAI_CANFD_HDA2
+        ret.safetyConfigs[-1].safetyParam |= Panda.FLAG_HYUNDAI_CANFD_HDA2
       if ret.flags & HyundaiFlags.CANFD_ALT_BUTTONS:
-        ret.safetyConfigs[1].safetyParam |= Panda.FLAG_HYUNDAI_CANFD_ALT_BUTTONS
+        ret.safetyConfigs[-1].safetyParam |= Panda.FLAG_HYUNDAI_CANFD_ALT_BUTTONS
       if ret.flags & HyundaiFlags.CANFD_CAMERA_SCC:
-        ret.safetyConfigs[1].safetyParam |= Panda.FLAG_HYUNDAI_CAMERA_SCC
+        ret.safetyConfigs[-1].safetyParam |= Panda.FLAG_HYUNDAI_CAMERA_SCC
     else:
       if candidate in LEGACY_SAFETY_MODE_CAR:
         # these cars require a special panda safety mode due to missing counters and checksums in the messages
@@ -297,12 +296,12 @@ class CarInterface(CarInterfaceBase):
     if CP.openpilotLongitudinalControl and not (CP.flags & HyundaiFlags.CANFD_CAMERA_SCC.value):
       addr, bus = 0x7d0, 0
       if CP.flags & HyundaiFlags.CANFD_HDA2.value:
-        addr, bus = 0x730, 5
+        addr, bus = 0x730, 1
       disable_ecu(logcan, sendcan, bus=bus, addr=addr, com_cont_req=b'\x28\x83\x01')
 
     # for blinkers
     if CP.flags & HyundaiFlags.ENABLE_BLINKERS:
-      disable_ecu(logcan, sendcan, bus=5, addr=0x7B1, com_cont_req=b'\x28\x83\x01')
+      disable_ecu(logcan, sendcan, bus=1, addr=0x7B1, com_cont_req=b'\x28\x83\x01')
 
   def _update(self, c):
     ret = self.CS.update(self.cp, self.cp_cam)

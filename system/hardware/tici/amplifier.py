@@ -104,7 +104,7 @@ class Amplifier:
   def __init__(self, debug=False):
     self.debug = debug
 
-  def set_config(self, config):
+  def _set_config(self, config):
     with SMBus(self.AMP_I2C_BUS) as bus:
       if self.debug:
         print(f"Setting \"{config.name}\" to {config.value}:")
@@ -116,17 +116,25 @@ class Amplifier:
       if self.debug:
         print(f"  Changed {hex(config.register)}: {hex(old_value)} -> {hex(new_value)}")
 
+  def _set_config_retry(self, config):
+    # retry in case panda is using the amp
+    for _ in range(10):
+      try:
+        self._set_config(config)
+      except OSError:
+        pass
+
   def set_global_shutdown(self, amp_disabled):
-    self.set_config(AmpConfig("Global shutdown", 0b0 if amp_disabled else 0b1, 0x51, 7, 0b10000000))
+    self._set_config_retry(AmpConfig("Global shutdown", 0b0 if amp_disabled else 0b1, 0x51, 7, 0b10000000))
 
   def initialize_configuration(self, model):
     self.set_global_shutdown(amp_disabled=True)
 
     for config in BASE_CONFIG:
-      self.set_config(config)
+      self._set_config_retry(config)
 
     for config in CONFIGS[model]:
-      self.set_config(config)
+      self._set_config_retry(config)
 
     self.set_global_shutdown(amp_disabled=False)
 

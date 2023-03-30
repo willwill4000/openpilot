@@ -138,11 +138,12 @@ bool CameraBuf::acquire() {
   cur_yuv_buf->set_frame_id(cur_frame_data.frame_id);
   vipc_server->send(cur_yuv_buf, &extra);
 
-  printf("preprocess completed. %zu \n", cur_yuv_buf->len);
-  FILE *dump_yuv_file = fopen("/tmp/wparsed", "wb");
-  fwrite(cur_yuv_buf->addr, cur_yuv_buf->len, sizeof(uint8_t), dump_yuv_file);
-  fclose(dump_yuv_file);
-
+  if (yuv_type == VISION_STREAM_WIDE_ROAD) {
+    printf("preprocess completed. %zu \n", cur_yuv_buf->len);
+    FILE *dump_yuv_file = fopen("/tmp/wparsed", "wb");
+    fwrite(cur_yuv_buf->addr, cur_yuv_buf->len, sizeof(uint8_t), dump_yuv_file);
+    fclose(dump_yuv_file);
+  }
   return true;
 }
 

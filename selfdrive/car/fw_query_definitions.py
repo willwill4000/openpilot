@@ -88,14 +88,14 @@ class FwQueryConfig:
     self.ecu_types = {(addr, sub_addr): ecu_type for fw in self.fw_versions.values()
                       for ecu_type, addr, sub_addr in (list(fw) + self.extra_ecus)}
 
-  def get_addr_chunks(self, request: Optional[Request]):
+  def get_addr_chunks(self, requests: List[Request]):
     addrs = []
     parallel_addrs = []
     for fw in self.fw_versions.values():
       for ecu_type, addr, sub_addr in list(fw) + self.extra_ecus:
         # Only query ecus in whitelist if whitelist is not empty
-        if request is None or len(request.whitelist_ecus) == 0 or \
-          ecu_type in request.whitelist_ecus:
+        ecu_in_requests = any([len(r.whitelist_ecus) == 0 or ecu_type in r.whitelist_ecus for r in requests])
+        if len(requests) == 0 or ecu_in_requests:
           a = (addr, sub_addr)
           if sub_addr is None:
             if a not in parallel_addrs:
@@ -108,4 +108,4 @@ class FwQueryConfig:
 
   @property
   def all_addrs(self) -> Set[Tuple[int, Optional[int]]]:
-    return {addr for addrs in self.get_addr_chunks(None) for addr in addrs}
+    return {addr for addrs in self.get_addr_chunks([]) for addr in addrs}

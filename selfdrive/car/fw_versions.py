@@ -238,7 +238,7 @@ def get_fw_versions(logcan, sendcan, query_brand=None, extra=None, timeout=0.1, 
       if extra is not None:
         config.extra_ecus += extra
 
-      for addr_chunk in config.get_addr_chunks(r):
+      for addr_chunk in config.get_addr_chunks([r]):
         try:
           if addr_chunk:  # TODO: remove?
             query = IsoTpParallelQuery(sendcan, logcan, r.bus, addr_chunk, r.request, r.response, r.rx_offset, debug=debug)

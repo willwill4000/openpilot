@@ -84,6 +84,14 @@ class FwQueryConfig:
   extra_ecus: List[EcuType] = field(default_factory=list)
   fw_versions: Dict[str, Dict[EcuType, List[bytes]]] = field(default_factory=dict)
 
+  def get_ecu_type(self, addr: int, sub_addr: Optional[int]) -> capnp.lib.capnp._EnumModule:
+    for fw in self.fw_versions.values():
+      for ecu_type, _addr, _sub_addr in fw:
+        if (addr, sub_addr) == (_addr, _sub_addr):
+          return ecu_type
+
+
+
   @property
   @cache
   def all_addrs(self) -> Set[Tuple[int, Optional[int]]]:
@@ -94,8 +102,27 @@ class FwQueryConfig:
     return addrs
 
   def __post_init__(self):
+    # Create auxiliary requests
     for i in range(len(self.requests)):
       if self.requests[i].auxiliary:
         new_request = copy.deepcopy(self.requests[i])
         new_request.bus += 4
         self.requests.append(new_request)
+
+    self.addrs = []
+    self.parallel_addrs = []
+    self.ecu_types = {}
+
+    for fw in self.fw_versions.values():
+      for ecu_type, addr, sub_addr in list(fw) + self.extra_ecus:
+        a = (addr, sub_addr)
+        self.ecu_types[a] = ecu_type
+
+        if sub_addr is None:
+          if a not in self.parallel_addrs:
+            self.parallel_addrs.append(a)
+        else:
+          if [a] not in self.addrs:
+            self.addrs.append([a])
+
+    self.addrs.insert(0, self.parallel_addrs)

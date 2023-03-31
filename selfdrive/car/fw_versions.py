@@ -237,15 +237,11 @@ def get_fw_versions(logcan, sendcan, query_brand=None, extra=None, timeout=0.1, 
   # ECUs using a subaddress need be queried one by one, the rest can be done in parallel
   addrs = []
   parallel_addrs = []
-  ecu_types = {}
 
   for brand, brand_versions in versions.items():
     for ecu in brand_versions.values():
       for ecu_type, addr, sub_addr in ecu.keys():
         a = (brand, addr, sub_addr)
-        if a not in ecu_types:
-          ecu_types[a] = ecu_type
-
         if sub_addr is None:
           if a not in parallel_addrs:
             parallel_addrs.append(a)
@@ -271,14 +267,14 @@ def get_fw_versions(logcan, sendcan, query_brand=None, extra=None, timeout=0.1, 
 
         try:
           addrs = [(a, s) for (b, a, s) in addr_chunk if b in (brand, 'any') and
-                   (len(r.whitelist_ecus) == 0 or ecu_types[(b, a, s)] in r.whitelist_ecus)]
+                   (len(r.whitelist_ecus) == 0 or config.ecu_types[(a, s)] in r.whitelist_ecus)]
 
           if addrs:
             query = IsoTpParallelQuery(sendcan, logcan, r.bus, addrs, r.request, r.response, r.rx_offset, debug=debug)
             for (tx_addr, sub_addr), version in query.get_data(timeout).items():
               f = car.CarParams.CarFw.new_message()
 
-              f.ecu = ecu_types.get((brand, tx_addr, sub_addr), Ecu.unknown)
+              f.ecu = config.ecu_types[(tx_addr, sub_addr)]
               f.fwVersion = version
               f.address = tx_addr
               f.responseAddress = uds.get_rx_addr_for_tx_addr(tx_addr, r.rx_offset)

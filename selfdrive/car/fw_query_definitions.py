@@ -85,6 +85,9 @@ class FwQueryConfig:
         new_request.bus += 4
         self.requests.append(new_request)
 
+    self.ecu_types = {(addr, sub_addr): ecu_type for fw in self.fw_versions.values()
+                      for ecu_type, addr, sub_addr in (list(fw) + self.extra_ecus)}
+
   def get_requests(self, num_pandas: int = 1):
     return [r for r in self.requests if r.bus <= num_pandas * 4 - 1]
 
@@ -109,8 +112,3 @@ class FwQueryConfig:
   @property
   def all_addrs(self) -> Set[Tuple[int, Optional[int]]]:
     return {addr for addrs in self.get_addr_chunks(None) for addr in addrs}
-
-  @property
-  def ecu_types(self):
-    return {(addr, sub_addr): ecu_type for fw in self.fw_versions.values()
-            for ecu_type, addr, sub_addr in (list(fw) + self.extra_ecus)}

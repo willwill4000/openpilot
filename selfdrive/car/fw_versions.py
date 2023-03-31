@@ -226,7 +226,11 @@ def get_fw_versions(logcan, sendcan, query_brand=None, extra=None, timeout=0.1, 
   car_fw = []
   fw_query_configs = [(brand, config) for brand, config in FW_QUERY_CONFIGS.items() if brand is None or brand == query_brand]
   for brand, config in fw_query_configs:
-    for r in config.get_requests(num_pandas):
+    for r in config.requests:
+      # Skip query if no panda available
+      if r.bus > num_pandas * 4 - 1:
+        continue
+
       # Toggle OBD multiplexing for each request
       if r.bus % 4 == 1:
         set_obd_multiplexing(params, r.obd_multiplexing)

@@ -2,7 +2,6 @@
 import capnp
 import copy
 from dataclasses import dataclass, field
-from functools import lru_cache
 import struct
 from typing import Dict, List, Optional, Set, Tuple
 
@@ -13,11 +12,6 @@ EcuType = Tuple[capnp.lib.capnp._EnumModule, int, Optional[int]]
 
 def p16(val):
   return struct.pack("!H", val)
-
-
-# TODO: import from common
-def cache(user_function, /):
-  return lru_cache(maxsize=None)(user_function)
 
 
 class StdQueries:
@@ -84,13 +78,14 @@ class FwQueryConfig:
   extra_ecus: List[EcuType] = field(default_factory=list)
   fw_versions: Dict[str, Dict[EcuType, List[bytes]]] = field(default_factory=dict)
 
-  def get_addr_chunk(self, request: Request):
+  def get_addr_chunks(self, request: Optional[Request]):
     addrs = []
     parallel_addrs = []
     for fw in self.fw_versions.values():
       for ecu_type, addr, sub_addr in list(fw) + self.extra_ecus:
         # Only query ecus in whitelist if whitelist is not empty
-        if len(request.whitelist_ecus) == 0 or ecu_type in request.whitelist_ecus:
+        if request is None or len(request.whitelist_ecus) == 0 or \
+          ecu_type in request.whitelist_ecus:
           a = (addr, sub_addr)
           if sub_addr is None:
             if a not in parallel_addrs:
@@ -105,13 +100,8 @@ class FwQueryConfig:
     return [r for r in self.requests if r.bus <= num_pandas * 4 - 1]
 
   @property
-  @cache
   def all_addrs(self) -> Set[Tuple[int, Optional[int]]]:
-    # Add ecus in database + extra ecus to match against
-    addrs = {(addr, sub_addr) for _, addr, sub_addr in self.extra_ecus}
-    for fw in self.fw_versions.values():
-      addrs |= {(addr, sub_addr) for _, addr, sub_addr in fw.keys()}
-    return addrs
+    return {addr for addrs in self.get_addr_chunks(None) for addr in addrs}
 
   def __post_init__(self):
     for i in range(len(self.requests)):

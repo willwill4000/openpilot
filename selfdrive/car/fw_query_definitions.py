@@ -78,6 +78,16 @@ class FwQueryConfig:
   extra_ecus: List[EcuType] = field(default_factory=list)
   fw_versions: Dict[str, Dict[EcuType, List[bytes]]] = field(default_factory=dict)
 
+  def __post_init__(self):
+    for i in range(len(self.requests)):
+      if self.requests[i].auxiliary:
+        new_request = copy.deepcopy(self.requests[i])
+        new_request.bus += 4
+        self.requests.append(new_request)
+
+  def get_requests(self, num_pandas: int = 1):
+    return [r for r in self.requests if r.bus <= num_pandas * 4 - 1]
+
   def get_addr_chunks(self, request: Optional[Request]):
     addrs = []
     parallel_addrs = []
@@ -96,16 +106,11 @@ class FwQueryConfig:
     addrs.insert(0, parallel_addrs)
     return addrs
 
-  def get_requests(self, num_pandas: int = 1):
-    return [r for r in self.requests if r.bus <= num_pandas * 4 - 1]
-
   @property
   def all_addrs(self) -> Set[Tuple[int, Optional[int]]]:
     return {addr for addrs in self.get_addr_chunks(None) for addr in addrs}
 
-  def __post_init__(self):
-    for i in range(len(self.requests)):
-      if self.requests[i].auxiliary:
-        new_request = copy.deepcopy(self.requests[i])
-        new_request.bus += 4
-        self.requests.append(new_request)
+  @property
+  def ecu_types(self):
+    return {(addr, sub_addr): ecu_type for fw in self.fw_versions.values()
+            for ecu_type, addr, sub_addr in (list(fw) + self.extra_ecus)}

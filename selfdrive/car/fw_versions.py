@@ -232,6 +232,9 @@ def get_fw_versions(logcan, sendcan, query_brand=None, extra=None, timeout=0.1, 
       if r.bus % 4 == 1:
         set_obd_multiplexing(params, r.obd_multiplexing)
 
+      if extra is not None:
+        config.extra_ecus += extra
+
       for addr_chunk in config.get_addr_chunk(r):
         try:
           if addr_chunk:  # TODO: remove?
@@ -277,13 +280,12 @@ if __name__ == "__main__":
 
   extra: Any = None
   if args.scan:
-    extra = {}
+    extra = []
     # Honda
     for i in range(256):
-      extra[(Ecu.unknown, 0x18da00f1 + (i << 8), None)] = []
-      extra[(Ecu.unknown, 0x700 + i, None)] = []
-      extra[(Ecu.unknown, 0x750, i)] = []
-    extra = {"any": {"debug": extra}}
+      extra.append((Ecu.unknown, 0x18da00f1 + (i << 8), None))
+      extra.append((Ecu.unknown, 0x700 + i, None))
+      extra.append((Ecu.unknown, 0x750, i))
 
   time.sleep(1.)
   num_pandas = len(messaging.recv_one_retry(pandaStates_sock).pandaStates)

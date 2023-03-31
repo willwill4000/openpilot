@@ -220,7 +220,6 @@ def get_fw_versions_ordered(logcan, sendcan, ecu_rx_addrs, timeout=0.1, num_pand
 
 
 def get_fw_versions(logcan, sendcan, query_brand=None, extra=None, timeout=0.1, num_pandas=1, debug=False, progress=False):
-  versions = VERSIONS.copy()
   params = Params()
 
   # Get versions and build capnp list to put into CarParams

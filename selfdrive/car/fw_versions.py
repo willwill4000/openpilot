@@ -223,19 +223,58 @@ def get_fw_versions(logcan, sendcan, query_brand=None, extra=None, timeout=0.1, 
   versions = VERSIONS.copy()
   params = Params()
 
+  # Each brand can define extra ECUs to query for data collection
+  for brand, config in FW_QUERY_CONFIGS.items():
+    versions[brand]["debug"] = {ecu: [] for ecu in config.extra_ecus}
+
+  if query_brand is not None:
+    versions = {query_brand: versions[query_brand]}
+
+  if extra is not None:
+    versions.update(extra)
+
+  # Extract ECU addresses to query from fingerprints
+  # ECUs using a subaddress need be queried one by one, the rest can be done in parallel
+  addrs = []
+  parallel_addrs = []
+  ecu_types = {}
+
+  for brand, brand_versions in versions.items():
+    for ecu in brand_versions.values():
+      for ecu_type, addr, sub_addr in ecu.keys():
+        a = (brand, addr, sub_addr)
+        if a not in ecu_types:
+          ecu_types[a] = ecu_type
+
+        if sub_addr is None:
+          if a not in parallel_addrs:
+            parallel_addrs.append(a)
+        else:
+          if [a] not in addrs:
+            addrs.append([a])
+
+  addrs.insert(0, parallel_addrs)
+
   # Get versions and build capnp list to put into CarParams
   car_fw = []
-  fw_query_configs = [(brand, config) for brand, config in FW_QUERY_CONFIGS.items() if brand is None or brand == query_brand]
-  for brand, config in fw_query_configs:
-    for r in config.get_requests(num_pandas):
-      # Toggle OBD multiplexing for each request
-      if r.bus % 4 == 1:
-        set_obd_multiplexing(params, r.obd_multiplexing)
+  requests = [(brand, config, r) for brand, config, r in REQUESTS if query_brand is None or brand == query_brand]
+  for addr in tqdm(addrs, disable=not progress):
+    for addr_chunk in chunks(addr):
+      for brand, config, r in requests:
+        # Skip query if no panda available
+        if r.bus > num_pandas * 4 - 1:
+          continue
 
-      for addr_chunk in config.get_addr_chunk(r):
+        # Toggle OBD multiplexing for each request
+        if r.bus % 4 == 1:
+          set_obd_multiplexing(params, r.obd_multiplexing)
+
         try:
-          if addr_chunk:  # TODO: remove?
-            query = IsoTpParallelQuery(sendcan, logcan, r.bus, addr_chunk, r.request, r.response, r.rx_offset, debug=debug)
+          addrs = [(a, s) for (b, a, s) in addr_chunk if b in (brand, 'any') and
+                   (len(r.whitelist_ecus) == 0 or ecu_types[(b, a, s)] in r.whitelist_ecus)]
+
+          if addrs:
+            query = IsoTpParallelQuery(sendcan, logcan, r.bus, addrs, r.request, r.response, r.rx_offset, debug=debug)
             for (tx_addr, sub_addr), version in query.get_data(timeout).items():
               f = car.CarParams.CarFw.new_message()
 

@@ -2,14 +2,22 @@
 import capnp
 import copy
 from dataclasses import dataclass, field
+from functools import lru_cache
 import struct
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import panda.python.uds as uds
+
+EcuType = Tuple[capnp.lib.capnp._EnumModule, int, Optional[int]]
 
 
 def p16(val):
   return struct.pack("!H", val)
+
+
+# TODO: import from common
+def cache(user_function, /):
+  return lru_cache(maxsize=None)(user_function)
 
 
 class StdQueries:
@@ -73,7 +81,17 @@ class FwQueryConfig:
   # Overrides and removes from essential ecus for specific models and ecus (exact matching)
   non_essential_ecus: Dict[capnp.lib.capnp._EnumModule, List[str]] = field(default_factory=dict)
   # Ecus added for data collection, not to be fingerprinted on
-  extra_ecus: List[Tuple[capnp.lib.capnp._EnumModule, int, Optional[int]]] = field(default_factory=list)
+  extra_ecus: List[EcuType] = field(default_factory=list)
+  fw_versions: Dict[str, Dict[EcuType, List[bytes]]] = field(default_factory=dict)
+
+  @property
+  @cache
+  def all_addrs(self) -> Set[Tuple[int, Optional[int]]]:
+    # Add ecus in database + extra ecus to match against
+    addrs = {(addr, sub_addr) for _, addr, sub_addr in self.extra_ecus}
+    for fw in self.fw_versions.values():
+      addrs |= {(addr, sub_addr) for _, addr, sub_addr in fw.keys()}
+    return addrs
 
   def __post_init__(self):
     for i in range(len(self.requests)):

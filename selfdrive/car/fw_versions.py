@@ -36,16 +36,6 @@ def build_fw_dict(fw_versions, filter_brand=None):
   return dict(fw_versions_dict)
 
 
-def get_brand_addrs():
-  brand_addrs = defaultdict(set)
-  for brand, cars in VERSIONS.items():
-    # Add ecus in database + extra ecus to match against
-    brand_addrs[brand] |= {(addr, sub_addr) for _, addr, sub_addr in FW_QUERY_CONFIGS[brand].extra_ecus}
-    for fw in cars.values():
-      brand_addrs[brand] |= {(addr, sub_addr) for _, addr, sub_addr in fw.keys()}
-  return brand_addrs
-
-
 def match_fw_to_car_fuzzy(fw_versions_dict, log=True, exclude=None):
   """Do a fuzzy FW match. This function will return a match, and the number of firmware version
   that were matched uniquely to that specific car. If multiple ECUs uniquely match to different cars
@@ -191,15 +181,13 @@ def get_present_ecus(logcan, sendcan, num_pandas=1) -> Set[EcuAddrBusType]:
 def get_brand_ecu_matches(ecu_rx_addrs):
   """Returns dictionary of brands and matches with ECUs in their FW versions"""
 
-  brand_addrs = get_brand_addrs()
   brand_matches = {brand: set() for brand, _, _ in REQUESTS}
-
   brand_rx_offsets = set((brand, r.rx_offset) for brand, _, r in REQUESTS)
   for addr, sub_addr, _ in ecu_rx_addrs:
     # Since we can't know what request an ecu responded to, add matches for all possible rx offsets
     for brand, rx_offset in brand_rx_offsets:
       a = (uds.get_rx_addr_for_tx_addr(addr, -rx_offset), sub_addr)
-      if a in brand_addrs[brand]:
+      if a in FW_QUERY_CONFIGS[brand].all_addrs:
         brand_matches[brand].add(a)
 
   return brand_matches

@@ -84,6 +84,26 @@ class FwQueryConfig:
   extra_ecus: List[EcuType] = field(default_factory=list)
   fw_versions: Dict[str, Dict[EcuType, List[bytes]]] = field(default_factory=dict)
 
+  def get_addr_chunk(self, request: Request):
+    addrs = []
+    parallel_addrs = []
+    for fw in self.fw_versions.values():
+      for ecu_type, addr, sub_addr in list(fw) + self.extra_ecus:
+        # Only query ecus in whitelist if whitelist is not empty
+        if len(request.whitelist_ecus) == 0 or ecu_type in request.whitelist_ecus:
+          a = (addr, sub_addr)
+          if sub_addr is None:
+            if a not in parallel_addrs:
+              parallel_addrs.append(a)
+          else:
+            if [a] not in addrs:
+              addrs.append([a])
+    addrs.insert(0, parallel_addrs)
+    return addrs
+
+  def get_requests(self, num_pandas: int = 1):
+    return [r for r in self.requests if r.bus <= num_pandas * 4 - 1]
+
   @property
   @cache
   def all_addrs(self) -> Set[Tuple[int, Optional[int]]]:

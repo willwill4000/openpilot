@@ -50,6 +50,7 @@ void Sound::update() {
   if (sm.updated("microphone")) {
     float volume = util::map_val(sm["microphone"].getMicrophone().getFilteredSoundPressureWeightedDb(), 30.f, 60.f, 0.f, 1.f);
     volume = QAudio::convertVolume(volume, QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
+    volume = volume / 2;
     Hardware::set_volume(volume);
   }
 

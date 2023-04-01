@@ -32,10 +32,10 @@ procs = [
   PythonProcess("micd", "system.micd"),
   PythonProcess("timezoned", "system.timezoned", enabled=not PC, offroad=True),
 
-  DaemonProcess("manage_athenad", "selfdrive.athena.manage_athenad", "AthenadPid"),
+  #DaemonProcess("manage_athenad", "selfdrive.athena.manage_athenad", "AthenadPid"),
   NativeProcess("dmonitoringmodeld", "selfdrive/modeld", ["./dmonitoringmodeld"], enabled=(not PC or WEBCAM), callback=driverview),
   NativeProcess("encoderd", "selfdrive/loggerd", ["./encoderd"]),
-  NativeProcess("loggerd", "selfdrive/loggerd", ["./loggerd"], onroad=False, callback=logging),
+  #NativeProcess("loggerd", "selfdrive/loggerd", ["./loggerd"], onroad=False, callback=logging),
   NativeProcess("modeld", "selfdrive/modeld", ["./modeld"]),
   NativeProcess("mapsd", "selfdrive/navd", ["./map_renderer"], enabled=False),
   NativeProcess("navmodeld", "selfdrive/modeld", ["./navmodeld"], enabled=False),
@@ -59,9 +59,9 @@ procs = [
   PythonProcess("plannerd", "selfdrive.controls.plannerd"),
   PythonProcess("radard", "selfdrive.controls.radard"),
   PythonProcess("thermald", "selfdrive.thermald.thermald", offroad=True),
-  PythonProcess("tombstoned", "selfdrive.tombstoned", enabled=not PC, offroad=True),
+  #PythonProcess("tombstoned", "selfdrive.tombstoned", enabled=not PC, offroad=True),
   PythonProcess("updated", "selfdrive.updated", enabled=not PC, onroad=False, offroad=True),
-  PythonProcess("uploader", "selfdrive.loggerd.uploader", offroad=True),
+  #PythonProcess("uploader", "selfdrive.loggerd.uploader", offroad=True),
   PythonProcess("statsd", "selfdrive.statsd", offroad=True),
 
   # debug procs

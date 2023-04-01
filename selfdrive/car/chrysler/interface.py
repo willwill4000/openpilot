@@ -1,12 +1,33 @@
 #!/usr/bin/env python3
+import numpy as np
 from cereal import car
+from math import tanh
 from panda import Panda
+from common.numpy_fast import interp
 from selfdrive.car import STD_CARGO_KG, get_safety_config
 from selfdrive.car.chrysler.values import CAR, RAM_HD, RAM_DT, RAM_CARS, ChryslerFlags
-from selfdrive.car.interfaces import CarInterfaceBase
+from selfdrive.car.interfaces import CarInterfaceBase, TorqueFromLateralAccelCallbackType, FRICTION_THRESHOLD
+from selfdrive.controls.lib.drive_helpers import get_friction
 
 
 class CarInterface(CarInterfaceBase):
+  @staticmethod
+  def torque_from_lateral_accel_ram1500(lateral_accel_value: float, torque_params: car.CarParams.LateralTorqueTuning,
+                                        lateral_accel_error: float, lateral_accel_deadzone: float, friction_compensation: bool) -> float:
+    friction = get_friction(lateral_accel_error, lateral_accel_deadzone, FRICTION_THRESHOLD, torque_params, friction_compensation)
+    a, b, c = [4, 0.4, 1.5]  # weights computed offline
+    steer_pts = [x for x in np.arange(-1, 1.01, 0.01)]
+    lataccel_pts = [(tanh(x * a) * b) + (x * c) for x in steer_pts]
+
+    steer_torque = interp(lateral_accel_value, lataccel_pts, steer_pts)
+    return float(steer_torque) + friction
+
+  def torque_from_lateral_accel(self) -> TorqueFromLateralAccelCallbackType:
+    if self.CP.carFingerprint == CAR.RAM_1500:
+      return self.torque_from_lateral_accel_ram1500
+    else:
+      return self.torque_from_lateral_accel_linear
+
   @staticmethod
   def _get_params(ret, candidate, fingerprint, car_fw, experimental_long):
     ret.carName = "chrysler"

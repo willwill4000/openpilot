@@ -16,3 +16,4 @@ fi
 
 export STAGING_ROOT="/data/safe_staging"
 export FINGERPRINT="HONDA CR-V 2017"
+export SKIP_FW_QUERY=1
